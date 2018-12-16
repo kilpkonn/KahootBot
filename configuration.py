@@ -1,5 +1,6 @@
 """Configuration."""
 import json
+import random
 from json import JSONDecodeError
 
 
@@ -9,12 +10,23 @@ class Configuration:
     def __init__(self):
         """Init."""
         self.names = []
+        self.names_given_out = []
         self.question_timeout = 60
+
+    def get_name(self):
+        """Get name for bot."""
+        choices = [x for x in self.names if x not in self.names_given_out]
+        if len(choices) <= 0:
+            choices = [x + '_' for x in self.names]
+
+        name_to_give = random.choice(choices)
+        self.names_given_out.append(name_to_give)
+        return name_to_give
 
     def load(self, file_name):
         """Load configuration."""
         try:
-            with open(file_name, 'r') as f:
+            with open(file_name, 'r', encoding="utf8") as f:
                 data = json.load(f)
                 self.names = data["names"]
                 self.question_timeout = data["question_timeout"]
