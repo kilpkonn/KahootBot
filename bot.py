@@ -22,6 +22,6 @@ class Bot:
         for i in range(len(self.color_sequence)):
             self.kahoot_web.wait_for_question()
             self.log.info("Answering question")
-            self.kahoot_web.answer_question("red")
+            self.kahoot_web.answer_question(self.color_sequence[i])
         self.log.success("Done quiz!")
 
