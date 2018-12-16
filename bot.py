@@ -22,7 +22,7 @@ class Bot:
         self.kahoot_web.start_answering()
         for i in range(len(self.color_sequence)):
             if i == 0:
-                self.kahoot_web.wait_for_question(timeout=300)
+                self.kahoot_web.wait_for_question(timeout=360)
             else:
                 self.kahoot_web.wait_for_question(timeout=self.question_timeout)
             self.log.info("Answering question")
