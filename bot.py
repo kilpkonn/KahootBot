@@ -6,11 +6,12 @@ from log import Log
 class Bot:
     """Bot."""
 
-    def __init__(self, name: str, color_sequence):
+    def __init__(self, name: str, color_sequence, question_timeout: int = 60):
         """Init."""
         self.name = name
         self.log = Log(self.name)
         self.color_sequence = color_sequence
+        self.question_timeout = question_timeout
         self.kahoot_web = KahootWeb(self.log)
 
     def start(self, pin):
@@ -23,7 +24,7 @@ class Bot:
             if i == 0:
                 self.kahoot_web.wait_for_question(timeout=300)
             else:
-                self.kahoot_web.wait_for_question(timeout=90)
+                self.kahoot_web.wait_for_question(timeout=self.question_timeout)
             self.log.info("Answering question")
             self.kahoot_web.answer_question(self.color_sequence[i])
         self.log.success("Done quiz!")

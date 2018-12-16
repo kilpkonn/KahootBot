@@ -37,7 +37,9 @@ class KahootManager:
 
     def main(self, name, number_of_questions=10):
         """Main."""
-        bot = Bot(f"{name}", [random.choice(["red", "blue", "green", "yellow"]) for _ in range(number_of_questions)])
+        bot = Bot(f"{name}",
+                  [random.choice(["red", "blue", "green", "yellow"]) for _ in range(number_of_questions)],
+                  question_timeout=self.config.question_timeout)
         bot.start(self.game_pin)
 
 

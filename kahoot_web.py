@@ -37,7 +37,6 @@ class KahootWeb:
                                 headers={'content-type': 'application/json',
                                          'authorization': data['access_token']}).json()
         if 'error' in response:
-            # TODO: Play random etc.
             self.log.error("Could not find kahoot ID (maybe it's private)")
             exit()
         qanda = {}
