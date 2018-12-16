@@ -11,6 +11,7 @@ class LogLevel(enum.Enum):
     SUCCESS = 2,
     WARN = 3,
     ERROR = 4,
+    INPUT = 5,
 
 
 class Log:
@@ -20,12 +21,17 @@ class Log:
         """Init."""
         self.bot_name = bot_name
 
-    def write_line(self, log_level: LogLevel, data: str):
+    def write_line(self, log_level: LogLevel, data: str, *args, **kwargs):
         """Write line."""
         time = datetime.datetime.now().strftime('%S.%M.%H')
         level = self.get_log_level(log_level).upper()
         color = self.get_color(log_level)
-        print(f"{color}[{self.bot_name} {time}] {level}: {data}")
+        print(f"{color}[{self.bot_name} {time}] {level}: {data}", *args, **kwargs)
+
+    def ask_input(self, data):
+        """Ask for user input."""
+        self.write_line(LogLevel.INPUT, data, end='')
+        return input(self.get_color(LogLevel.INPUT))
 
     def debug(self, data):
         """Log debug"""
@@ -59,6 +65,8 @@ class Log:
             return 'WARN'
         elif log_level == LogLevel.ERROR:
             return 'ERROR'
+        elif log_level == LogLevel.INPUT:
+            return 'INPUT'
 
     def get_color(self, log_level: LogLevel):
         """Get color."""
@@ -72,3 +80,5 @@ class Log:
             return Fore.YELLOW
         elif log_level == LogLevel.ERROR:
             return Fore.RED
+        elif log_level == LogLevel.INPUT:
+            return Fore.BLUE
