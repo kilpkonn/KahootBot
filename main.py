@@ -18,6 +18,7 @@ class KahootManager:
         self.game_pin = None
         self.bot_count = None
         self.bot_pool = None
+        self.number_of_questions = None
         self.config = None
 
     def load_configuration(self):
@@ -31,14 +32,16 @@ class KahootManager:
             self.game_pin = self.log.ask_input("Enter game PIN: ")
         if not self.bot_count or self.bot_count == 0:
             self.bot_count = int(self.log.ask_input("Enter amount of bots to create: "))
+        if not self.number_of_questions or self.number_of_questions == 0:
+            self.number_of_questions = int(self.log.ask_input("Enter the amount of questions: "))
 
         p = Pool(self.bot_count)
         p.map(self.main, [self.config.get_name() for _ in range(self.bot_count)])
 
-    def main(self, name, number_of_questions=10):
+    def main(self, name):
         """Main."""
         bot = Bot(f"{name}",
-                  [random.choice(["red", "blue", "green", "yellow"]) for _ in range(number_of_questions)],
+                  [random.choice(["red", "blue", "green", "yellow"]) for _ in range(self.number_of_questions)],
                   question_timeout=self.config.question_timeout)
         bot.start(self.game_pin)
 

@@ -23,7 +23,7 @@ class Log:
 
     def write_line(self, log_level: LogLevel, data: str, *args, **kwargs):
         """Write line."""
-        time = datetime.datetime.now().strftime('%S.%M.%H')
+        time = datetime.datetime.now().strftime('%H:%M:%S')
         level = self.get_log_level(log_level).upper()
         color = self.get_color(log_level)
         print(f"{color}[{self.bot_name} {time}] {level}: {data}", *args, **kwargs)
