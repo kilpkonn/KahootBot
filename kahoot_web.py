@@ -55,7 +55,10 @@ class KahootWeb:
 
     def connect(self, kahoot_id, name):
         """Connect to game."""
-        self.driver = webdriver.Chrome()
+        options = webdriver.ChromeOptions()
+        options.add_argument('headless')
+        options.add_argument('window-size=1200x600')
+        self.driver = webdriver.Chrome(chrome_options=options)
         self.driver.get('https://kahoot.it/#/')
         self.wait_for_item(self.driver, '#inputSession')
         self.driver.find_element_by_css_selector('#inputSession').send_keys(kahoot_id)
@@ -79,10 +82,10 @@ class KahootWeb:
         """Start answering questions."""
         self.driver.switch_to.frame(self.driver.find_element_by_tag_name("iframe"))
 
-    def wait_for_question(self):
+    def wait_for_question(self, timeout: int = 60):
         """Wait for next question."""
         try:
-            self.wait_for_item(self.driver, "div#app", timeout=60)
+            self.wait_for_item(self.driver, "div#app", timeout=timeout)
         except TimeoutException:
             self.log.error("Timed out waiting for question.")
 

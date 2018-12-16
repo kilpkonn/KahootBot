@@ -15,7 +15,7 @@ class Kahoot:
         log = Log("Root")
         log.info("Starting KahootBot...")
         self.game_pin = log.ask_input("Enter game PIN: ")
-        self.bot_count = log.ask_input("Enter amount of bots to create:  ")
+        self.bot_count = int(log.ask_input("Enter amount of bots to create:  "))
         p = Pool(self.bot_count)
         print(p.map(self.main, [x for x in range(self.bot_count)]))
 

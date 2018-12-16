@@ -20,7 +20,10 @@ class Bot:
         self.log.success("Connected to game!")
         self.kahoot_web.start_answering()
         for i in range(len(self.color_sequence)):
-            self.kahoot_web.wait_for_question()
+            if i == 0:
+                self.kahoot_web.wait_for_question(timeout=300)
+            else:
+                self.kahoot_web.wait_for_question(timeout=90)
             self.log.info("Answering question")
             self.kahoot_web.answer_question(self.color_sequence[i])
         self.log.success("Done quiz!")
