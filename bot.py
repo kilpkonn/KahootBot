@@ -13,19 +13,28 @@ class Bot:
         self.color_sequence = color_sequence
         self.question_timeout = question_timeout
         self.kahoot_web = KahootWeb(self.log)
+        self.question = 0
 
-    def start(self, pin):
+    async def start(self, pin):
         """Start Bot."""
         self.log.info(f"Starting bot {self.name}...")
-        self.kahoot_web.connect(pin, self.name)
+        await self.kahoot_web.connect(pin, self.name)
         self.log.success("Connected to game!")
-        self.kahoot_web.start_answering()
-        for i in range(len(self.color_sequence)):
-            if i == 0:
-                self.kahoot_web.wait_for_question(timeout=360)
-            else:
-                self.kahoot_web.wait_for_question(timeout=self.question_timeout)
-            self.log.info("Answering question")
-            self.kahoot_web.answer_question(self.color_sequence[i])
+        await self.kahoot_web.start_answering()
+        self.question = 0
+
+    async def wait_for_question(self):
+        """Wait for question."""
+        await self.kahoot_web.wait_for_question(timeout=360)
+
+    async def answer_question(self):
+        """Answer question."""
+        self.log.info("Answering question")
+        await self.kahoot_web.answer_question(self.color_sequence[self.question])
+        self.question += 1
         self.log.success("Done quiz!")
 
+    async def stop(self):
+        """Stop bot."""
+        self.log.info("Stopping bot!")
+        await self.kahoot_web.quit()

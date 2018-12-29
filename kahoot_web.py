@@ -1,5 +1,6 @@
 """Kahoot web."""
 import sys, time, json
+import asyncio
 import requests
 from selenium import webdriver
 from selenium.webdriver.support.ui import WebDriverWait
@@ -22,10 +23,10 @@ class KahootWeb:
                             'yellow': '.quiz-board > button:nth-of-type(3)',
                             'green': '.quiz-board > button:nth-of-type(4)'}
 
-    def wait_for_item(self, driver, css, timeout=10):
+    async def wait_for_item(self, driver, css, timeout=10):
         WebDriverWait(driver, timeout).until(expected_conditions.visibility_of_element_located((By.CSS_SELECTOR, css)))
 
-    def get_details(self, kahootid, email: str, password: str):
+    async def get_details(self, kahootid, email: str, password: str):
         authparams = {'username': email, 'password': password, 'grant_type': 'password'}
         self.log.info('Trying to authenticate')
         data = requests.post('https://create.kahoot.it/rest/authenticate',
@@ -52,23 +53,23 @@ class KahootWeb:
         print(qanda)
         return qanda, color_sequence
 
-    def connect(self, kahoot_id, name):
+    async def connect(self, kahoot_id, name):
         """Connect to game."""
         options = webdriver.ChromeOptions()
         options.add_argument('headless')
         options.add_argument('window-size=1200x600')
         self.driver = webdriver.Chrome(chrome_options=options)
         self.driver.get('https://kahoot.it/#/')
-        self.wait_for_item(self.driver, '#inputSession')
+        await self.wait_for_item(self.driver, '#inputSession')
         self.driver.find_element_by_css_selector('#inputSession').send_keys(kahoot_id)
         self.driver.find_element_by_css_selector('.btn-greyscale').click()
-        self.wait_for_item(self.driver, '#username')
+        await self.wait_for_item(self.driver, '#username')
         self.driver.find_element_by_css_selector('#username').send_keys(name)
-        time.sleep(0.5)
+        await asyncio.sleep(0.5)
         self.driver.find_element_by_css_selector('.btn-greyscale').click()
         self.log.success("Connected to Kahoot!")
 
-    def answer_question(self, answer):
+    async def answer_question(self, answer):
         """Answer question."""
         try:
             self.driver.find_element_by_css_selector(self.lookuptable[answer]).click()
@@ -77,17 +78,17 @@ class KahootWeb:
         except ElementNotVisibleException:
             self.log.error("Question was skipped.")
 
-    def start_answering(self):
+    async def start_answering(self):
         """Start answering questions."""
         self.driver.switch_to.frame(self.driver.find_element_by_tag_name("iframe"))
 
-    def wait_for_question(self, timeout: int = 60):
+    async def wait_for_question(self, timeout: int = 60):
         """Wait for next question."""
         try:
-            self.wait_for_item(self.driver, "div#app", timeout=timeout)
+            await self.wait_for_item(self.driver, "div#app", timeout=timeout)
         except TimeoutException:
             self.log.error("Timed out waiting for question.")
 
-    def quit(self):
+    async def quit(self):
         """Quit game."""
         self.driver.quit()
