@@ -48,7 +48,12 @@ class KahootManager:
 
         for _ in range(self.number_of_questions):
             await self.bots[0].wait_for_question()
-            await asyncio.wait([x.answer_question() for x in self.bots])
+            tasks = []
+            for i, bot in enumerate(self.bots):
+                tasks.append(bot.answer_question())
+                if i % 5 == 4:
+                    await asyncio.wait(tasks)
+                    tasks = []
 
         await asyncio.wait([x.stop() for x in self.bots])
         self.log.success("Done quiz!")
