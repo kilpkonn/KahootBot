@@ -35,19 +35,22 @@ class KahootManager:
             self.bot_count = int(self.log.ask_input("Enter amount of bots to create: "))
         if not self.number_of_questions or self.number_of_questions == 0:
             self.number_of_questions = int(self.log.ask_input("Enter the amount of questions: "))
-        for _ in range(self.bot_count):
+        tasks = []
+        for i in range(self.bot_count):
             bot = Bot(f"{self.config.get_name()}",
                       [random.choice(["red", "blue", "green", "yellow"]) for _ in range(self.number_of_questions)],
                       question_timeout=self.config.question_timeout)
-            await bot.start(self.game_pin)
+            tasks.append(bot.start(self.game_pin))
             self.bots.append(bot)
+            if i % 5 == 4:
+                await asyncio.wait(tasks)
+                tasks = []
+
         for _ in range(self.number_of_questions):
             await self.bots[0].wait_for_question()
-            for bot in self.bots:
-                await bot.answer_question()
+            await asyncio.wait([x.answer_question() for x in self.bots])
 
-        for bot in self.bots:
-            await bot.stop()
+        await asyncio.wait([x.stop() for x in self.bots])
         self.log.success("Done quiz!")
 
 

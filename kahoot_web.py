@@ -58,6 +58,8 @@ class KahootWeb:
         options = webdriver.ChromeOptions()
         options.add_argument('headless')
         options.add_argument('window-size=1200x600')
+        prefs = {"profile.managed_default_content_settings.images": 2, 'disk-cache-size': 4096}
+        options.add_experimental_option("prefs", prefs)
         self.driver = webdriver.Chrome(chrome_options=options)
         self.driver.get('https://kahoot.it/#/')
         await self.wait_for_item(self.driver, '#inputSession')
