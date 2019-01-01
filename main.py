@@ -1,7 +1,6 @@
 """Main."""
 from colorama import init
 import asyncio
-import random
 
 from log import Log
 from bot import Bot
