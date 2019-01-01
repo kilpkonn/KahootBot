@@ -26,17 +26,9 @@ class KahootWeb:
     async def wait_for_item(self, driver, css, timeout=10):
         WebDriverWait(driver, timeout).until(expected_conditions.visibility_of_element_located((By.CSS_SELECTOR, css)))
 
-    async def get_details(self, kahootid, email: str, password: str):
-        authparams = {'username': email, 'password': password, 'grant_type': 'password'}
-        self.log.info('Trying to authenticate')
-        data = requests.post('https://create.kahoot.it/rest/authenticate',
-                             data=json.dumps(authparams).encode(), headers={'content-type': 'application/json'}).json()
-        if 'error' in data:
-            self.log.error('Could not authenticate')
-            exit()
+    async def get_details(self, kahootid):
         response = requests.get('https://create.kahoot.it/rest/kahoots/{}'.format(kahootid),
-                                headers={'content-type': 'application/json',
-                                         'authorization': data['access_token']}).json()
+                                headers={'content-type': 'application/json'}).json()
         if 'error' in response:
             self.log.error("Could not find kahoot ID (maybe it's private)")
             exit()
@@ -50,7 +42,6 @@ class KahootWeb:
                     qanda[question['question']] = question['choices'][i]['answer']
                     color_sequence.append(lookuptable[i])
                     break
-        print(qanda)
         return qanda, color_sequence
 
     async def connect(self, kahoot_id, name):

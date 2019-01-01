@@ -1,4 +1,6 @@
 """Bot."""
+import random
+
 from kahoot_web import KahootWeb
 from log import Log
 
@@ -6,7 +8,7 @@ from log import Log
 class Bot:
     """Bot."""
 
-    def __init__(self, name: str, color_sequence, question_timeout: int = 60):
+    def __init__(self, name: str, color_sequence: list = None, question_timeout: int = 60):
         """Init."""
         self.name = name
         self.log = Log(self.name)
@@ -30,9 +32,12 @@ class Bot:
     async def answer_question(self):
         """Answer question."""
         self.log.info("Answering question")
-        await self.kahoot_web.answer_question(self.color_sequence[self.question])
+        if self.color_sequence:
+            await self.kahoot_web.answer_question(self.color_sequence[self.question])
+        else:
+            await self.kahoot_web.answer_question(random.choice(["red", "blue", "green", "yellow"]))
         self.question += 1
-        self.log.success("Done quiz!")
+        self.log.success("Answered question!")
 
     async def stop(self):
         """Stop bot."""
