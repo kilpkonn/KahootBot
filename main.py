@@ -38,7 +38,7 @@ class KahootManager:
             self.bot_count = int(self.log.ask_input("Enter amount of bots to create: "))
         if not self.kahoot_id or self.kahoot_id == '':
             self.kahoot_id = str(self.log.ask_input("Enter the ID of Kahoot!: "))
-            if not self.kahoot_id or self.kahoot_id == '':
+            if not self.kahoot_id or self.kahoot_id.strip() == '':
                 self.game_details = (None, None)
             else:
                 self.game_details = await self.kahoot_web.get_details(self.kahoot_id)
@@ -56,7 +56,7 @@ class KahootManager:
         if tasks:
             await asyncio.wait(tasks)
         n = 0
-        self.input = self.log.ask_input("Enter exit to stop!")
+        self.input = self.log.ask_input("Enter 'exit' to stop!")
         while n > 0 or self.input.lower() != "exit":
             if self.input.isdigit():
                 n = int(self.input)
