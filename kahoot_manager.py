@@ -31,13 +31,13 @@ class KahootManager:
         self.config.load("./configuration/config.json")
 
     def run(self):
-        """Play game"""
+        """Play game."""
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
         loop.run_until_complete(self.play())
 
     async def play(self):
-        """Play game"""
+        """Play game."""
         if not self.game_pin or self.game_pin == 0:
             self.log.ask_input("Enter game PIN: ")
             self.game_pin = str(await self._wait_for_input())

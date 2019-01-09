@@ -33,7 +33,7 @@ class Log:
         self.write_line(LogLevel.INPUT, data)
 
     def debug(self, data):
-        """Log debug"""
+        """Log debug."""
         self.write_line(LogLevel.DEBUG, data)
 
     def info(self, data):
