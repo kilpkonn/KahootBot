@@ -16,10 +16,13 @@ class Bot:
         self.question_timeout = question_timeout
         self.kahoot_web = KahootWeb(self.log)
         self.question = 0
+        self._error_count = 0
+        self.running = False
 
     async def start(self, pin):
         """Start Bot."""
         self.log.info(f"Starting bot {self.name}...")
+        self.running = True
         await self.kahoot_web.connect(pin, self.name)
         self.log.success("Connected to game!")
         await self.kahoot_web.start_answering()
@@ -27,7 +30,12 @@ class Bot:
 
     async def wait_for_question(self):
         """Wait for question."""
-        await self.kahoot_web.wait_for_question(timeout=360)
+        while not await self.kahoot_web.wait_for_question(timeout=360):
+            self._error_count += 1
+            if self._error_count > 2:
+                await self.stop()
+        else:
+            self._error_count = 0
 
     async def answer_question(self):
         """Answer question."""
@@ -43,3 +51,4 @@ class Bot:
         """Stop bot."""
         self.log.info("Stopping bot!")
         await self.kahoot_web.quit()
+        self.running = False

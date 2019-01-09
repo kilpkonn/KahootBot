@@ -69,6 +69,10 @@ class KahootManager:
             await self.bots[0].wait_for_question()
             tasks = []
             for i, bot in enumerate(self.bots):
+                if not bot.running:
+                    self.bots.remove(bot)
+                    continue
+
                 tasks.append(bot.answer_question())
                 if i % 5 == 4:
                     await asyncio.wait(tasks)
