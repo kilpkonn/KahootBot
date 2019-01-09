@@ -30,8 +30,7 @@ class Log:
 
     def ask_input(self, data):
         """Ask for user input."""
-        self.write_line(LogLevel.INPUT, data, end='')
-        return input(self.get_color(LogLevel.INPUT))
+        self.write_line(LogLevel.INPUT, data)
 
     def debug(self, data):
         """Log debug"""

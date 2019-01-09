@@ -1,5 +1,6 @@
 """Kahoot Manager."""
 import asyncio
+import queue
 
 from log import Log
 from bot import Bot
@@ -15,7 +16,7 @@ class KahootManager:
         self.log = Log("Root")
         self.log.info("Starting KahootBot...")
         self.kahoot_web = KahootWeb(self.log)
-        self.input = ''
+        self.input_queue = queue.Queue()
         self.game_details = None
         self.game_pin = None
         self.bot_count = None
@@ -29,14 +30,23 @@ class KahootManager:
         self.config = Configuration()
         self.config.load("./configuration/config.json")
 
+    def run(self):
+        """Play game"""
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        loop.run_until_complete(self.play())
+
     async def play(self):
         """Play game"""
         if not self.game_pin or self.game_pin == 0:
-            self.game_pin = self.log.ask_input("Enter game PIN: ")
+            self.log.ask_input("Enter game PIN: ")
+            self.game_pin = str(await self._wait_for_input())
         if not self.bot_count or self.bot_count == 0:
-            self.bot_count = int(self.log.ask_input("Enter amount of bots to create: "))
+            self.log.ask_input("Enter amount of bots to create: ")
+            self.bot_count = int(await self._wait_for_input())
         if not self.kahoot_id or self.kahoot_id == '':
-            self.kahoot_id = str(self.log.ask_input("Enter the ID of Kahoot!: "))
+            self.log.ask_input("Enter the ID of Kahoot!: ")
+            self.kahoot_id = str(await self._wait_for_input(accept_blank=True))
             if not self.kahoot_id or self.kahoot_id.strip() == '':
                 self.game_details = (None, None)
             else:
@@ -54,12 +64,8 @@ class KahootManager:
                 tasks = []
         if tasks:
             await asyncio.wait(tasks)
-        n = 0
-        self.input = self.log.ask_input("Enter 'exit' to stop!")
-        while n > 0 or self.input.lower() != "exit":
-            if self.input.isdigit():
-                n = int(self.input)
-
+        self.log.ask_input("Enter 'exit' to stop!")
+        while self.input_queue.empty() or str(await self._wait_for_input()) != "exit":
             await self.bots[0].wait_for_question()
             tasks = []
             for i, bot in enumerate(self.bots):
@@ -69,11 +75,17 @@ class KahootManager:
                     tasks = []
             if tasks:
                 await asyncio.wait(tasks)
-            if n == 0:
-                self.input = self.log.ask_input("Enter exit to stop!")
-            else:
-                n -= 1
 
         self.log.info("Stopping bots!")
         await asyncio.wait([x.stop() for x in self.bots])
         self.log.success("Done quiz!")
+
+    async def _wait_for_input(self, accept_blank: bool = False):
+        """Wait for input."""
+        while True:
+            await asyncio.sleep(0.05)
+            if not self.input_queue.empty():
+                data = self.input_queue.get()
+                if accept_blank or data != "":
+                    break
+        return data
