@@ -13,7 +13,7 @@ async def main():
     manager_thread = threading.Thread(target=kahoot_manager.run)
     manager_thread.start()
     while True:
-        await asyncio.sleep(0.05)
+        await asyncio.sleep(0.01)
         data = input()
         kahoot_manager.input_queue.put(data)
         if data.lower() == "exit":

@@ -24,8 +24,8 @@ class Log:
     def write_line(self, log_level: LogLevel, data: str, *args, **kwargs):
         """Write line."""
         time = datetime.datetime.now().strftime('%H:%M:%S')
-        level = self.get_log_level(log_level).upper()
-        color = self.get_color(log_level)
+        level = self._get_log_level(log_level).upper()
+        color = self._get_color(log_level)
         print(f"{color}[{self.bot_name} {time}] {level}: {data}", *args, **kwargs)
 
     def ask_input(self, data):
@@ -52,7 +52,7 @@ class Log:
         """Log error."""
         self.write_line(LogLevel.ERROR, data)
 
-    def get_log_level(self, log_level: LogLevel):
+    def _get_log_level(self, log_level: LogLevel):
         """Get log level str."""
         if log_level == LogLevel.DEBUG:
             return 'DEBUG'
@@ -67,7 +67,7 @@ class Log:
         elif log_level == LogLevel.INPUT:
             return 'INPUT'
 
-    def get_color(self, log_level: LogLevel):
+    def _get_color(self, log_level: LogLevel):
         """Get color."""
         if log_level == LogLevel.DEBUG:
             return Fore.WHITE
