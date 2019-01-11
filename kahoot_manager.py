@@ -65,7 +65,7 @@ class KahootManager:
         if tasks:
             await asyncio.wait(tasks)
         self.log.ask_input("Enter 'exit' to stop!")
-        while self.input_queue.empty() or str(await self._wait_for_input()) != "exit":
+        while self.input_queue.empty() or str(await self._wait_for_input(accept_blank=True)) != "exit":
             await self.bots[0].wait_for_question()
             tasks = []
             for i, bot in enumerate(self.bots):

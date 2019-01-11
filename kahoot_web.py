@@ -47,8 +47,11 @@ class KahootWeb:
     async def connect(self, kahoot_id, name):
         """Connect to game."""
         options = webdriver.ChromeOptions()
-        options.add_argument('headless')
-        options.add_argument('window-size=1200x600')
+        options.add_argument("--headless")
+        options.add_argument("test-type")
+        options.add_argument("--js-flags=--expose-gc")
+        options.add_argument("--enable-precise-memory-info")
+        options.add_argument("--disable-default-apps")
         prefs = {"profile.managed_default_content_settings.images": 2, 'disk-cache-size': 4096}
         options.add_experimental_option("prefs", prefs)
         self.driver = webdriver.Chrome(chrome_options=options)
@@ -79,8 +82,10 @@ class KahootWeb:
         """Wait for next question."""
         try:
             await self.wait_for_item(self.driver, "div#app", timeout=timeout)
+            return True
         except TimeoutException:
             self.log.error("Timed out waiting for question.")
+        return False
 
     async def quit(self):
         """Quit game."""
