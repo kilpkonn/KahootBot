@@ -1,6 +1,7 @@
 """Kahoot Manager."""
 import asyncio
 import queue
+import threading
 
 from log import Log
 from bot import Bot
@@ -8,11 +9,12 @@ from kahoot_web import KahootWeb
 from configuration import Configuration
 
 
-class KahootManager:
+class KahootManager(threading.Thread):
     """KahootManager."""
 
     def __init__(self):
         """Init."""
+        threading.Thread.__init__(self)
         self.log = Log("Root")
         self.log.info("Starting KahootBot...")
         self.kahoot_web = KahootWeb(self.log)
@@ -34,7 +36,12 @@ class KahootManager:
         """Play game."""
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
-        loop.run_until_complete(self.play())
+        loop.run_until_complete(self.main())
+
+    async def main(self):
+        """Main function in KahootManager."""
+        await self.load_configuration()
+        await self.play()
 
     async def play(self):
         """Play game."""
