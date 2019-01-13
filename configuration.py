@@ -28,8 +28,10 @@ class Configuration:
         try:
             with open(file_name, 'r', encoding="utf8") as f:
                 data = json.load(f)
-                self.names = data["names"]
                 self.question_timeout = data["question_timeout"]
+            with open(data["path_to_names"], 'r', encoding="utf8") as names_file:
+                names_data = json.load(names_file)
+                self.names = names_data
             return data
         except JSONDecodeError:
             print("Specified config file is corrupt. Choose if you want to overwrite it!")
@@ -40,7 +42,6 @@ class Configuration:
             else:
                 print("Using default configuration.")
                 return self
-
         except FileNotFoundError:
             print("Specified config file doesn't exist!")
             print("Generating new config file.")
@@ -50,6 +51,6 @@ class Configuration:
         """Save configuration."""
         with open(file_name, 'w') as f:
             json.dump({
-                "names": self.names,
+                "path_to_names": "./names.json",
                 "question_timeout": self.question_timeout,
                 }, f)
