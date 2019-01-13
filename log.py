@@ -27,7 +27,7 @@ class Log:
         level = self._get_log_level(log_level).upper()
         color = self._get_color(log_level)
         style = self._get_style(log_level)
-        print(f"{color}{style}[{self.bot_name} {time}] {level}: {data}", *args, **kwargs)
+        print(f"{color[0]}{style}[{self.bot_name} {time}] {level}:{color[1]} {data}", *args, **kwargs)
 
     def ask_input(self, data):
         """Ask for user input."""
@@ -71,17 +71,17 @@ class Log:
     def _get_color(self, log_level: LogLevel):
         """Get color."""
         if log_level == LogLevel.DEBUG:
-            return Fore.WHITE
+            return Fore.WHITE, Fore.WHITE
         elif log_level == LogLevel.INFO:
-            return Fore.WHITE
+            return Fore.LIGHTMAGENTA_EX, Fore.WHITE
         elif log_level == LogLevel.SUCCESS:
-            return Fore.GREEN
+            return Fore.GREEN, Fore.LIGHTCYAN_EX
         elif log_level == LogLevel.WARN:
-            return Fore.YELLOW
+            return Fore.YELLOW, Fore.LIGHTRED_EX
         elif log_level == LogLevel.ERROR:
-            return Fore.RED
+            return Fore.RED, Fore.RED
         elif log_level == LogLevel.INPUT:
-            return Fore.BLUE
+            return Fore.BLUE, Fore.LIGHTBLUE_EX
 
     def _get_style(self, log_level: LogLevel):
         """Get style."""
