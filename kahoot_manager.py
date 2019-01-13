@@ -59,20 +59,16 @@ class KahootManager(threading.Thread):
             else:
                 self.game_details = await self.kahoot_web.get_details(self.kahoot_id)
 
-        tasks = []
         for i in range(self.bot_count):
             bot = Bot(f"{self.config.get_name()}",
                       self.game_details[1],
                       question_timeout=self.config.question_timeout)
-            tasks.append(bot.start(self.game_pin))
             self.bots.append(bot)
-            if i % 5 == 4:
-                await asyncio.wait(tasks)
-                tasks = []
-        if tasks:
-            await asyncio.wait(tasks)
+
+        await self.start_bots()
         self.log.ask_input("Enter 'exit' to stop!")
-        while await self._wait_for_input(accept_blank=True):
+        while self.bots:
+            await self._wait_for_input(accept_blank=True)
             await self.bots[0].wait_for_question()
             tasks = []
             for i, bot in enumerate(self.bots):
@@ -90,8 +86,21 @@ class KahootManager(threading.Thread):
         await self.stop_bots()
         self.log.success("Done quiz!")
 
+    async def start_bots(self):
+        """Start bots."""
+        tasks = []
+        for i, bot in enumerate(self.bots):
+            tasks.append(bot.start(self.game_pin))
+            if i % 5 == 4:
+                await asyncio.wait(tasks)
+                tasks = []
+        if tasks:
+            await asyncio.wait(tasks)
+
     async def stop_bots(self):
         """Stop bots."""
+        if not self.bots:
+            return
         self.log.info("Stopping bots!")
         await asyncio.wait([x.stop() for x in self.bots])
 
@@ -110,8 +119,8 @@ class KahootManager(threading.Thread):
             await asyncio.sleep(0.05)
             if not self.input_queue.empty():
                 data = self.input_queue.get()
-                if self.check_for_command(data) and (accept_blank or data != ""):
+                if await self.check_for_command(data) and (accept_blank or data != ""):
                     break
             elif accept_blank:
-                return
+                return ''
         return data
