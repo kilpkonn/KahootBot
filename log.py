@@ -1,5 +1,5 @@
 """Log."""
-from colorama import Fore, Back, Style
+from colorama import Fore, Style
 
 import enum
 import datetime
@@ -26,7 +26,8 @@ class Log:
         time = datetime.datetime.now().strftime('%H:%M:%S')
         level = self._get_log_level(log_level).upper()
         color = self._get_color(log_level)
-        print(f"{color}[{self.bot_name} {time}] {level}: {data}", *args, **kwargs)
+        style = self._get_style(log_level)
+        print(f"{color}{style}[{self.bot_name} {time}] {level}: {data}", *args, **kwargs)
 
     def ask_input(self, data):
         """Ask for user input."""
@@ -81,3 +82,18 @@ class Log:
             return Fore.RED
         elif log_level == LogLevel.INPUT:
             return Fore.BLUE
+
+    def _get_style(self, log_level: LogLevel):
+        """Get style."""
+        if log_level == LogLevel.DEBUG:
+            return Style.NORMAL
+        elif log_level == LogLevel.INFO:
+            return Style.NORMAL
+        elif log_level == LogLevel.SUCCESS:
+            return Style.BRIGHT
+        elif log_level == LogLevel.WARN:
+            return Style.BRIGHT
+        elif log_level == LogLevel.ERROR:
+            return Style.BRIGHT
+        elif log_level == LogLevel.INPUT:
+            return Style.DIM
