@@ -72,7 +72,7 @@ class KahootManager(threading.Thread):
         if tasks:
             await asyncio.wait(tasks)
         self.log.ask_input("Enter 'exit' to stop!")
-        while self.input_queue.empty() or str(await self._wait_for_input(accept_blank=True)) != "exit":
+        while await self._wait_for_input(accept_blank=True):
             await self.bots[0].wait_for_question()
             tasks = []
             for i, bot in enumerate(self.bots):
@@ -87,9 +87,22 @@ class KahootManager(threading.Thread):
             if tasks:
                 await asyncio.wait(tasks)
 
+        await self.stop_bots()
+        self.log.success("Done quiz!")
+
+    async def stop_bots(self):
+        """Stop bots."""
         self.log.info("Stopping bots!")
         await asyncio.wait([x.stop() for x in self.bots])
-        self.log.success("Done quiz!")
+
+    async def check_for_command(self, input_str):
+        """Check if input is command and handle it."""
+        if input_str == "exit":
+            await self.stop_bots()
+        elif input_str == "restart":
+            pass
+        else:
+            return input_str
 
     async def _wait_for_input(self, accept_blank: bool = False):
         """Wait for input."""
@@ -97,6 +110,8 @@ class KahootManager(threading.Thread):
             await asyncio.sleep(0.05)
             if not self.input_queue.empty():
                 data = self.input_queue.get()
-                if accept_blank or data != "":
+                if self.check_for_command(data) and (accept_blank or data != ""):
                     break
+            elif accept_blank:
+                return
         return data
