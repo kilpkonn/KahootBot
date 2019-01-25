@@ -14,7 +14,9 @@ class KahootManager(threading.Thread):
 
     def __init__(self):
         """Init."""
-        threading.Thread.__init__(self)
+        super(KahootManager, self).__init__()
+        self._stop_event = threading.Event()
+
         self.log = Log("Root")
         self.log.info("Starting KahootBot...")
         self.kahoot_web = KahootWeb(self.log)
@@ -67,7 +69,7 @@ class KahootManager(threading.Thread):
 
         await self.start_bots()
         self.log.ask_input("Enter 'exit' to stop!")
-        while self.bots:
+        while self.bots and not self.stopped():
             await self._wait_for_input(accept_blank=True)
             await self.bots[0].wait_for_question()
             tasks = []
@@ -112,6 +114,14 @@ class KahootManager(threading.Thread):
             pass
         else:
             return input_str
+
+    def stop(self):
+        """Stop thread."""
+        self._stop_event.set()
+
+    def stopped(self):
+        """Check if thread is stopped."""
+        return self._stop_event.is_set()
 
     async def _wait_for_input(self, accept_blank: bool = False):
         """Wait for input."""

@@ -1,6 +1,5 @@
 """Main."""
 from colorama import init, Fore
-
 from kahoot_manager import KahootManager
 
 
@@ -23,6 +22,10 @@ def main():
             break
         elif data.lower() == "help":
             print_help()
+        elif data.lower() == "restart":
+            manager_thread.stop()
+            manager_thread = KahootManager()
+            manager_thread.start()
         else:
             manager_thread.input_queue.put(data)
 

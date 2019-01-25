@@ -1,5 +1,4 @@
 """Kahoot web."""
-import sys, time, json
 import asyncio
 import requests
 from selenium import webdriver
